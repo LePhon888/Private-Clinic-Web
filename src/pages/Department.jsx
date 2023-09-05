@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Apis, { endpoints } from "../configs/Apis";
+import { Spinner } from "react-bootstrap";
 
 function Department() {
   const [departments, setDepartments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5); // Set the number of items to display per page
-
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchDepartment = async () => {
+      setIsLoading(true);
       try {
-        const res = await axios.get(
-          "http://localhost:8080/Clinic/api/departments"
-        );
+        const res = await Apis.get(endpoints["departments"]);
         setDepartments(res.data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -20,11 +22,8 @@ function Department() {
     fetchDepartment();
   }, []);
 
-  // Calculate the index of the last item on the current page
   const indexOfLastItem = currentPage * itemsPerPage;
-  // Calculate the index of the first item on the current page
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // Get the current items to display based on the pagination
   const currentItems = departments.slice(indexOfFirstItem, indexOfLastItem);
 
   // Change page
@@ -32,6 +31,7 @@ function Department() {
 
   return (
     <div className="container">
+      {isLoading && <Spinner />}
       <ul>
         {currentItems.map((department) => (
           <li key={department.id}>
@@ -41,7 +41,6 @@ function Department() {
         ))}
       </ul>
 
-      {/* Pagination Controls */}
       <nav style={{ display: "flex", justifyContent: "center" }}>
         <ul className="pagination">
           {Array.from({

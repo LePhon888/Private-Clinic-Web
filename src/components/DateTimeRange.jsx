@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Col, Container, Row, Spinner } from "react-bootstrap";
+import { Alert, Col, Container, Row, Spinner } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { addDays } from "date-fns";
 import axios from "axios";
+import { authApi, endpoints } from "../configs/Apis";
 
 function DateTimeRange({ handleDate, handleTime }) {
   const [hours, setHours] = useState([]);
   const [selectedHour, setSelectedHour] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [scheduleDetailDate, setScheduleDetailDate] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [countPatient, setCountPatient] = useState(null);
+  const [regulation, setRegulation] = useState(null);
 
   const currentDate = new Date();
   const dayInMillis = 24 * 60 * 60 * 1000; // One day in milliseconds
@@ -70,6 +74,11 @@ function DateTimeRange({ handleDate, handleTime }) {
       scheduleDetailDate != null &&
       selectedDate.toDateString() === currentDate.toDateString()
     ) {
+      console.log(scheduleDetailDate.map((s) => s.hourId.id));
+      console.log("hour.id");
+
+      console.log(hour.id);
+
       return scheduleDetailDate.some((e) => e.hourId.id === hour.id);
     }
     return false;
@@ -78,8 +87,10 @@ function DateTimeRange({ handleDate, handleTime }) {
   useEffect(() => {
     const fetchHours = async () => {
       try {
-        const res = await axios.get("http://localhost:8080/Clinic/api/hours");
+        setIsLoading(true);
+        const res = await authApi().get(endpoints["hours"]);
         setHours(res.data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -90,10 +101,13 @@ function DateTimeRange({ handleDate, handleTime }) {
   useEffect(() => {
     const fetchScheduleDetailDate = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8080/Clinic/api/scheduledetails?date=${formatDate(
-            selectedDate
-          )}`
+        // const res = await axios.get(
+        //   `http://localhost:8080/Clinic/api/scheduledetails?date=${formatDate(
+        //     selectedDate
+        //   )}`
+        // );
+        const res = await authApi().get(
+          `${endpoints["scheduleDetail"]}?date=${formatDate(selectedDate)}`
         );
         setScheduleDetailDate(res.data);
       } catch (error) {
@@ -102,6 +116,38 @@ function DateTimeRange({ handleDate, handleTime }) {
     };
     fetchScheduleDetailDate();
   }, [selectedDate]);
+
+  //Check number of patients by date
+  useEffect(() => {
+    const fetchCountPatient = async () => {
+      try {
+        setIsLoading(true);
+        const res = await authApi().get(
+          `${endpoints["scheduleDetail"]}count?date=${formatDate(selectedDate)}`
+        );
+        setCountPatient(res.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+    fetchCountPatient();
+  }, [selectedDate]);
+
+  //Get new regulation
+  useEffect(() => {
+    const fetchRegulation = async () => {
+      try {
+        setIsLoading(true);
+        const res = await authApi().get(`${endpoints["numberOfPatients"]}`);
+        setRegulation(res.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+    fetchRegulation();
+  }, []);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -164,35 +210,42 @@ function DateTimeRange({ handleDate, handleTime }) {
       <Row>
         <Col xs lg="12">
           <div className="timepicker">
-            <p>Giờ khám (*)</p>
+            <p>
+              Giờ khám (*)
+              {isLoading && <Spinner className="mx-4" />}
+            </p>
             {selectedDate && (
               <Row>
-                {hours.map((hour) => (
-                  <Col
-                    xs
-                    lg="2"
-                    key={hour.id}
-                    className="my-2 mx-2 p-2 rounded-6 text-center rounded"
-                    style={{
-                      cursor: "pointer",
-                      backgroundColor:
-                        checkValidDateTime(hour) || checkDuplicateDateTime(hour)
-                          ? "#f7f7f7"
+                {regulation && countPatient < regulation.numberOfPatients ? (
+                  hours.map((hour) => (
+                    <Col
+                      xs
+                      lg="2"
+                      key={hour.id}
+                      className="my-2 mx-2 p-2 rounded-6 text-center rounded"
+                      style={{
+                        cursor: "pointer",
+                        backgroundColor: checkValidDateTime(hour)
+                          ? // || checkDuplicateDateTime(hour)
+                            "#f7f7f7"
                           : selectedHour.id === hour.id
                           ? "#0d6efd"
                           : "",
-                      color:
-                        checkValidDateTime(hour) || checkDuplicateDateTime(hour)
-                          ? "#d3d3d3"
+                        color: checkValidDateTime(hour)
+                          ? // || checkDuplicateDateTime(hour)
+                            "#d3d3d3"
                           : selectedHour.id === hour.id
                           ? "white"
                           : "",
-                    }}
-                    onClick={() => handleHourChange(hour)}
-                  >
-                    {hour.hour}
-                  </Col>
-                ))}
+                      }}
+                      onClick={() => handleHourChange(hour)}
+                    >
+                      {hour.hour}
+                    </Col>
+                  ))
+                ) : (
+                  <Alert variant="danger">Vượt quá số lượng bệnh nhân</Alert>
+                )}
               </Row>
             )}
           </div>

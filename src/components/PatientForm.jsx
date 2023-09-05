@@ -1,5 +1,6 @@
 import axios from "axios";
 import moment from "moment/moment";
+import { useContext } from "react";
 import { useEffect, useState } from "react";
 import {
   Container,
@@ -11,6 +12,7 @@ import {
   FloatingLabel,
 } from "react-bootstrap";
 import DatePicker from "react-datepicker";
+import { UserContext } from "../App";
 
 function PatientForm({ handleContinue, inforPatient }) {
   const [name, setName] = useState(inforPatient.name || "");
@@ -21,10 +23,14 @@ function PatientForm({ handleContinue, inforPatient }) {
   const [gender, setGender] = useState(inforPatient.gender || "");
   const [birthday, setBirthday] = useState(inforPatient.birthday || "");
   const [validated, setValidated] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [user, dispatch] = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = { name, email, birthday, number, address, gender, reason };
+    const formData = selectedUser
+      ? selectedUser
+      : { name, email, birthday, number, address, gender, reason };
     const patientForm = document.getElementById("patientForm");
     if (patientForm.checkValidity()) {
       handleContinue(formData);

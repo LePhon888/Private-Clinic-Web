@@ -1,11 +1,15 @@
 import axios from "axios";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { authApi, endpoints } from "../configs/Apis";
+import { UserContext } from "../App";
 
 function SubmitScheduleForm({ infoPatient, handleContinue, handleBack }) {
   const [success, setSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [user, dispatch] = useContext(UserContext);
+
   const navigate = useNavigate();
 
   const changeFormatDate = (date) => {
@@ -23,6 +27,7 @@ function SubmitScheduleForm({ infoPatient, handleContinue, handleBack }) {
       number: infoPatient.number,
       address: infoPatient.address,
     },
+    registerPatient: { user },
     doctorId: infoPatient.infoPatient.selectedDoctor,
     hourId: infoPatient.infoPatient.time,
   };
@@ -30,8 +35,8 @@ function SubmitScheduleForm({ infoPatient, handleContinue, handleBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8080/Clinic/api/scheduledetail",
+      const response = await authApi().post(
+        endpoints["scheduleDetail"],
         filterInforPatient
       );
 

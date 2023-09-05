@@ -1,10 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Container, Form, Button, ProgressBar, Spinner } from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import DateRange from "./DateTimeRange";
 import DateTimeRange from "./DateTimeRange";
+import { UserContext } from "../App";
+import { authApi, endpoints } from "../configs/Apis";
 function SelectedDoctorForm({ handleContinue, handleBack }) {
   const [departments, setDepartments] = useState([]);
   const [doctors, setDoctors] = useState([]);
@@ -13,15 +15,18 @@ function SelectedDoctorForm({ handleContinue, handleBack }) {
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [user, dispatch] = useContext(UserContext);
+
   const isFormValid = selectedDepartment && selectedDoctor && date && time;
 
   useEffect(() => {
     const fetchDepartment = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          "http://localhost:8080/Clinic/api/departments"
-        );
+        // const res = await axios.get(
+        //   "http://localhost:8080/Clinic/api/departments"
+        // );
+        const res = await authApi().get(endpoints["departments"]);
         setDepartments(res.data);
         setLoading(false);
       } catch (error) {
@@ -35,8 +40,11 @@ function SelectedDoctorForm({ handleContinue, handleBack }) {
     const fetchDoctorByDepartmentId = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(
-          `http://localhost:8080/Clinic/api/doctors?departmentId=${selectedDepartment.id}`
+        // const res = await axios.get(
+        //   `http://localhost:8080/Clinic/api/doctors?departmentId=${selectedDepartment.id}`
+        // );
+        const res = await authApi().get(
+          `${endpoints["doctors"]}?departmentId=${selectedDepartment.id}`
         );
         setDoctors(res.data);
         setLoading(false);
@@ -49,13 +57,13 @@ function SelectedDoctorForm({ handleContinue, handleBack }) {
 
   const handleDepartment = (e) => {
     const selectedIndex = e.target.selectedIndex;
-    const selectedDept = departments[selectedIndex - 1]; // Subtract 1 because the first option is "Chọn chuyên khoa"
+    const selectedDept = departments[selectedIndex - 1];
     setSelectedDepartment(selectedDept);
     setSelectedDoctor({});
   };
   const handleDoctor = (e) => {
     const selectedIndex = e.target.selectedIndex;
-    const selectedDoctor = doctors[selectedIndex - 1]; // Subtract 1 because the first option is "Chọn chuyên khoa"
+    const selectedDoctor = doctors[selectedIndex - 1];
     setSelectedDoctor(selectedDoctor);
   };
 
