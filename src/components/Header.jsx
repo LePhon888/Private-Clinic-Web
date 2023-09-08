@@ -49,6 +49,17 @@ function Header() {
                   </li>
                 )}
 
+                {user && user.userRole === "ROLE_DOCTOR" && (
+                  <li class="nav-item">
+                    <Link
+                      to="/medical-report/patient-list/"
+                      class="nav-link mx-2"
+                    >
+                      Phiếu khám
+                    </Link>
+                  </li>
+                )}
+
                 {user === null ? (
                   <>
                     <Link className="nav-link text-info" to="/login">
@@ -70,9 +81,7 @@ function Header() {
                             >
                               Quản lý lịch khám
                             </Link>
-                            <Link className="nav-link text-success" to="/">
-                              Chào {user.username}
-                            </Link>
+
                             <Link
                               class="text-dark text-decoration-none mx-3"
                               to="/medical-register"
@@ -82,6 +91,11 @@ function Header() {
                               </button>
                             </Link>
                           </>
+                        )}
+                        {user && (
+                          <Link className="nav-link text-success" to="/">
+                            Chào {user.username}
+                          </Link>
                         )}
                         <Button variant="secondary" onClick={logout}>
                           Đăng xuất

@@ -9,7 +9,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import Table from "react-bootstrap/Table";
-import Apis, { endpoints } from "../configs/Apis";
+import Apis, { authApi, endpoints } from "../configs/Apis";
 import { AiFillCaretDown, AiFillCaretUp, AiOutlineMail } from "react-icons/ai";
 import { RiBillLine } from "react-icons/ri";
 import Bill from "../components/Bill";
@@ -39,7 +39,7 @@ const PatientList = () => {
     const fetchScheduleDetail = async () => {
       setLoading(true);
       try {
-        const res = await Apis.get(endpoints["scheduleDetail"]);
+        const res = await authApi().get(endpoints["scheduleDetail"]);
         setScheduleDetail(res.data);
         setLoading(false);
       } catch (error) {
@@ -99,9 +99,12 @@ const PatientList = () => {
   const handleIsConfirm = (id) => {
     const fetchUpdateIsConfirm = async () => {
       try {
-        const res = await Apis.patch(`${endpoints["updateIsConfirm"]}${id}`, {
-          isConfirm: 0,
-        });
+        const res = await authApi().patch(
+          `${endpoints["updateIsConfirm"]}${id}`,
+          {
+            isConfirm: 0,
+          }
+        );
         setIsConfirm({ id });
       } catch (error) {
         console.error("Error updating isConfirm:", error);
@@ -123,9 +126,11 @@ const PatientList = () => {
   const handleMedicalReport = (patientId) => {
     const fetchMedicalReport = async () => {
       try {
-        const res = await Apis.get(
+        const res = await authApi().get(
           `${endpoints["medicalReport"]}?patientId=${patientId}&isPaid=0`
         );
+        console.log(res.data);
+
         setMedicalReport(res.data);
       } catch (error) {
         console.error("Error get medical report:", error);

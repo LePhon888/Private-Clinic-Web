@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.2.1",
     "axios": "^1.4.0",
     "bootstrap": "^5.3.1",
+    "html-to-pdf-js": "^0.9.3",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",

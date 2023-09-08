@@ -13,8 +13,14 @@ export const endpoints = {
   updateIsConfirm: `${SERVER_CONTEXT}/api/schedule-detail/`,
   updateIsCancel: `${SERVER_CONTEXT}/api/schedule-detail/cancel/`,
   bill: `${SERVER_CONTEXT}/api/bill`,
+
   medicineBill: `${SERVER_CONTEXT}/api/medicine-bill`,
-  medicalReport: `${SERVER_CONTEXT}/api/medical-report`,
+  reportDetail: `${SERVER_CONTEXT}/api/report-details/`,
+  medicalReport: `${SERVER_CONTEXT}/api/medical-report/`,
+  category: `${SERVER_CONTEXT}/api/categories/`,
+  medicine: `${SERVER_CONTEXT}/api/medicines/`,
+  medicineUnit: `${SERVER_CONTEXT}/api/medicine-unit/`,
+
   login: `${SERVER_CONTEXT}/api/login/`,
   currentUser: `${SERVER_CONTEXT}/api/current-user/`,
   register: `${SERVER_CONTEXT}/api/users/`,

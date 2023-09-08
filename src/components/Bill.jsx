@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Apis, { endpoints } from "../configs/Apis";
+import Apis, { authApi, endpoints } from "../configs/Apis";
 import { Alert, Button, Fade, Table } from "react-bootstrap";
 
 const Bill = (props) => {
@@ -49,8 +49,10 @@ const Bill = (props) => {
         const idArray = id !== null ? [id] : medicalReport.map((m) => m.id);
         setMedicalReportId(idArray);
         const [res1, res2] = await Promise.all([
-          Apis.get(`${endpoints["bill"]}?medicalReportId=${idArray}`),
-          Apis.get(`${endpoints["medicineBill"]}?medicalReportId=${idArray}`),
+          authApi().get(`${endpoints["bill"]}?medicalReportId=${idArray}`),
+          authApi().get(
+            `${endpoints["medicineBill"]}?medicalReportId=${idArray}`
+          ),
         ]);
 
         const billData = res1.data;
@@ -84,10 +86,10 @@ const Bill = (props) => {
 
     const fetchPaid = async () => {
       try {
-        const res = await Apis.patch(
+        const res = await authApi().patch(
           `${endpoints["medicalReport"]}?id=${medicalReportId}`
         );
-        const res1 = await Apis.get(
+        const res1 = await authApi().get(
           `${endpoints["medicalReport"]}?patientId=${patientIdArray}&isPaid=0`
         );
         setMedicalReport(res1.data);
