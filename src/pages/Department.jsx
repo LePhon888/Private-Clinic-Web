@@ -6,7 +6,7 @@ import { Spinner } from "react-bootstrap";
 function Department() {
   const [departments, setDepartments] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Set the number of items to display per page
+  const [itemsPerPage] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     const fetchDepartment = async () => {

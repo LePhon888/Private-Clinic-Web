@@ -6,7 +6,7 @@ import { addDays } from "date-fns";
 import axios from "axios";
 import { authApi, endpoints } from "../configs/Apis";
 
-function DateTimeRange({ handleDate, handleTime }) {
+function DateTimeRange({ handleDate, handleTime, selectedDoctor }) {
   const [hours, setHours] = useState([]);
   const [selectedHour, setSelectedHour] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
@@ -74,16 +74,17 @@ function DateTimeRange({ handleDate, handleTime }) {
       scheduleDetailDate != null &&
       selectedDate.toDateString() === currentDate.toDateString()
     ) {
-      console.log(scheduleDetailDate.map((s) => s.hourId.id));
-      console.log("hour.id");
+      // console.log(scheduleDetailDate.map((s) => s.hourId.id));
+      // console.log("hour.id");
 
-      console.log(hour.id);
+      // console.log(hour.id);
 
       return scheduleDetailDate.some((e) => e.hourId.id === hour.id);
     }
     return false;
   }
 
+  console.log(scheduleDetailDate);
   useEffect(() => {
     const fetchHours = async () => {
       try {
@@ -149,6 +150,7 @@ function DateTimeRange({ handleDate, handleTime }) {
     fetchRegulation();
   }, []);
 
+  console.log(selectedDate);
   const handleDateChange = (date) => {
     setSelectedDate(date);
     handleDate(date);
@@ -225,18 +227,20 @@ function DateTimeRange({ handleDate, handleTime }) {
                       className="my-2 mx-2 p-2 rounded-6 text-center rounded"
                       style={{
                         cursor: "pointer",
-                        backgroundColor: checkValidDateTime(hour)
-                          ? // || checkDuplicateDateTime(hour)
-                            "#f7f7f7"
-                          : selectedHour.id === hour.id
-                          ? "#0d6efd"
-                          : "",
-                        color: checkValidDateTime(hour)
-                          ? // || checkDuplicateDateTime(hour)
-                            "#d3d3d3"
-                          : selectedHour.id === hour.id
-                          ? "white"
-                          : "",
+                        backgroundColor:
+                          checkValidDateTime(hour) ||
+                          checkDuplicateDateTime(hour)
+                            ? "#f7f7f7"
+                            : selectedHour.id === hour.id
+                            ? "#0d6efd"
+                            : "",
+                        color:
+                          checkValidDateTime(hour) ||
+                          checkDuplicateDateTime(hour)
+                            ? "#d3d3d3"
+                            : selectedHour.id === hour.id
+                            ? "white"
+                            : "",
                       }}
                       onClick={() => handleHourChange(hour)}
                     >

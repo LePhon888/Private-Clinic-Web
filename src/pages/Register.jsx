@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import Apis, { endpoints } from "../configs/Apis";
+import Apis, { authApi, endpoints } from "../configs/Apis";
 import MySpinner from "../components/MySpinner";
 import DatePicker from "react-datepicker";
 import moment from "moment/moment";
@@ -21,6 +21,12 @@ const Register = () => {
   });
   const [err, setErr] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [email, setEmail] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState(null);
+  const [isDuplicateEmail, setIsDuplicateEmail] = useState(false);
+  const [isDuplicatePhoneNumber, setIsDuplicatePhoneNumber] = useState(false);
+
   const image = useRef();
   const nav = useNavigate();
   const register = (e) => {
@@ -50,6 +56,37 @@ const Register = () => {
       return { ...current, [field]: value };
     });
   };
+
+  useEffect(() => {
+    const fetchUserByEmail = async () => {
+      try {
+        const res = await authApi().get(
+          `${endpoints["userByEmail"]}?email=${email}`
+        );
+        setIsDuplicateEmail(true);
+      } catch (error) {
+        setIsDuplicateEmail(false);
+        console.error("Error checking email duplicate:", error);
+      }
+    };
+    fetchUserByEmail();
+  }, [email]);
+
+  useEffect(() => {
+    const fetchUserByPhoneNumber = async () => {
+      try {
+        const res = await authApi().get(
+          `${endpoints["userByPhoneNumber"]}?phoneNumber=${phoneNumber}`
+        );
+        setIsDuplicatePhoneNumber(true);
+      } catch (error) {
+        setIsDuplicatePhoneNumber(false);
+        console.error("Error checking phone number duplicate:", error);
+      }
+    };
+    fetchUserByPhoneNumber();
+  }, [phoneNumber]);
+
   return (
     <Container>
       <h1 className="text-center text-info mt-2">ĐĂNG KÝ NGƯỜI DÙNG</h1>
@@ -116,18 +153,34 @@ const Register = () => {
         <Form.Group className="mb-3">
           <Form.Control
             type="tel"
-            onChange={(e) => change(e.target.value, "phoneNumber")}
+            onChange={(e) => {
+              change(e.target.value, "phoneNumber");
+              setPhoneNumber(e.target.value);
+            }}
             placeholder="Điện thoại (*)"
           />
         </Form.Group>
+        {isDuplicatePhoneNumber && (
+          <Alert variant="danger">
+            Số điện thoại đã được đăng ký với tài khoản khác
+          </Alert>
+        )}
         <Form.Group className="mb-3">
           <Form.Control
-            onChange={(e) => change(e.target.value, "email")}
+            onChange={(e) => {
+              change(e.target.value, "email");
+              setEmail(e.target.value);
+            }}
             type="email"
             placeholder="Email (*)"
             required
           />
         </Form.Group>
+        {isDuplicateEmail && (
+          <Alert variant="danger">
+            Email đã được đăng ký với tài khoản khác
+          </Alert>
+        )}
         <Form.Group className="mb-3">
           <Form.Control
             value={user.password}

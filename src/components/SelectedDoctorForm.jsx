@@ -120,7 +120,11 @@ function SelectedDoctorForm({ handleContinue, handleBack }) {
         </Col>
         {selectedDoctor.id && (
           <Col xs lg="6">
-            <DateTimeRange handleDate={handleDate} handleTime={handleTime} />
+            <DateTimeRange
+              handleDate={handleDate}
+              handleTime={handleTime}
+              selectedDoctor={selectedDoctor}
+            />
           </Col>
         )}
       </Row>

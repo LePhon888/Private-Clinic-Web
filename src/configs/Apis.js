@@ -26,6 +26,8 @@ export const endpoints = {
   register: `${SERVER_CONTEXT}/api/users/`,
   patient: `${SERVER_CONTEXT}/api/patient/`,
   numberOfPatients: `${SERVER_CONTEXT}/api/new-regulation/`,
+  userByEmail: `${SERVER_CONTEXT}/api/user/get-by-email`,
+  userByPhoneNumber: `${SERVER_CONTEXT}/api/user/get-by-phonenumber`,
 };
 
 export const authApi = () => {
